@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SSCB Monitor</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="./manifest.json" />
+  <meta name="theme-color" content="#22c97a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="SSCB" />
+  <link rel="apple-touch-icon" href="./icon-192.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0d0f14;
+      --surface: #13161e;
+      --surface2: #1a1d28;
+      --border: rgba(255,255,255,0.07);
+      --border-strong: rgba(255,255,255,0.14);
+      --text: #e8eaf0;
+      --text-muted: #6b7280;
+      --text-dim: #3d4150;
+      --green: #22c97a;
+      --green-bg: rgba(34,201,122,0.1);
+      --green-border: rgba(34,201,122,0.25);
+      --red: #f05252;
+      --red-bg: rgba(240,82,82,0.1);
+      --red-border: rgba(240,82,82,0.25);
+      --amber: #f59e0b;
+      --amber-bg: rgba(245,158,11,0.08);
+      --mono: 'Share Tech Mono', monospace;
+      --sans: 'DM Sans', sans-serif;
+    }
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: env(safe-area-inset-top, 1.5rem) 1rem env(safe-area-inset-bottom, 2rem);
+      padding-top: max(env(safe-area-inset-top), 1.5rem);
+    }
+    header {
+      width: 100%; max-width: 720px;
+      display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+    .header-title {
+      font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--text-muted); font-family: var(--mono); margin-bottom: 4px;
+    }
+    .header-name { font-size: 22px; font-weight: 600; color: var(--text); letter-spacing: -0.3px; }
+    .live-pill {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 11px; font-family: var(--mono); letter-spacing: 0.1em;
+      color: var(--green); background: var(--green-bg);
+      border: 1px solid var(--green-border);
+      border-radius: 99px; padding: 5px 12px; margin-top: 4px; transition: all 0.3s;
+    }
+    .live-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green); animation: blink 2s ease-in-out infinite;
+    }
+    .live-pill.disconnected { color: var(--text-muted); background: transparent; border-color: var(--border); }
+    .live-pill.disconnected .live-dot { background: var(--text-muted); animation: none; }
+    .live-pill.fault { color: var(--red); background: var(--red-bg); border-color: var(--red-border); }
+    .live-pill.fault .live-dot { background: var(--red); }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
+
+    .grid { width: 100%; max-width: 720px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 1.25rem 1.25rem;
+    }
+    .card-label {
+      font-size: 11px; font-family: var(--mono); letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px;
+    }
+    .card-value { font-family: var(--mono); font-size: 38px; color: var(--text); line-height: 1; letter-spacing: -1px; }
+    .card-unit  { font-size: 16px; color: var(--text-muted); margin-left: 4px; }
+    .card-sub   { font-size: 12px; color: var(--text-dim); margin-top: 8px; font-family: var(--mono); }
+
+    .current-bar-wrap { margin-top: 14px; height: 4px; background: var(--surface2); border-radius: 99px; overflow: hidden; }
+    .current-bar-fill { height: 100%; border-radius: 99px; background: var(--green); transition: width 0.8s ease, background 0.4s; width: 0%; }
+    .current-bar-fill.warn   { background: var(--amber); }
+    .current-bar-fill.danger { background: var(--red); }
+
+    .status-indicator { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .status-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: all 0.3s; }
+    .status-icon.ok    { background: var(--green-bg); }
+    .status-icon.fault { background: var(--red-bg); }
+    .status-text { font-size: 16px; font-weight: 600; transition: color 0.3s; }
+    .status-text.ok    { color: var(--green); }
+    .status-text.fault { color: var(--red); }
+
+    .card-full { grid-column: 1 / -1; }
+    .breaker-row { display: flex; align-items: center; justify-content: space-between; }
+    .breaker-state { font-size: 28px; font-weight: 600; font-family: var(--mono); letter-spacing: -0.5px; transition: color 0.3s; }
+    .breaker-state.on    { color: var(--green); }
+    .breaker-state.off   { color: var(--text-muted); }
+    .breaker-state.fault { color: var(--red); }
+    .breaker-desc { font-size: 12px; color: var(--text-muted); margin-top: 4px; font-family: var(--mono); }
+
+    .toggle-btn {
+      position: relative; width: 64px; height: 34px; border-radius: 99px;
+      background: var(--surface2); border: 1px solid var(--border-strong);
+      cursor: pointer; transition: background 0.25s, border-color 0.25s, opacity 0.25s;
+      flex-shrink: 0; user-select: none; -webkit-tap-highlight-color: transparent;
+    }
+    .toggle-btn.on { background: var(--green); border-color: var(--green); }
+    .toggle-btn.disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+    .toggle-knob {
+      position: absolute; top: 3px; left: 3px; width: 26px; height: 26px;
+      border-radius: 50%; background: var(--text);
+      transition: transform 0.25s cubic-bezier(.34,1.56,.64,1); pointer-events: none;
+    }
+    .toggle-btn.on .toggle-knob { transform: translateX(30px); background: #fff; }
+
+    .fault-strip {
+      display: none; margin-top: 14px; padding: 10px 14px;
+      background: var(--red-bg); border: 1px solid var(--red-border);
+      border-radius: 10px; font-size: 13px; color: var(--red);
+      font-family: var(--mono); letter-spacing: 0.02em;
+    }
+    .fault-strip.show { display: block; }
+
+    .log-list { display: flex; flex-direction: column; }
+    .log-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 9px 0; border-bottom: 1px solid var(--border);
+      font-size: 13px; font-family: var(--mono);
+    }
+    .log-row:last-child { border-bottom: none; }
+    .log-left { display: flex; align-items: center; gap: 10px; }
+    .log-dot  { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .log-dot.ok    { background: var(--green); }
+    .log-dot.fault { background: var(--red); }
+    .log-dot.warn  { background: var(--amber); }
+    .log-msg  { color: var(--text); }
+    .log-time { color: var(--text-dim); font-size: 11px; white-space: nowrap; margin-left: 12px; }
+    .empty-log { font-size: 12px; color: var(--text-dim); font-family: var(--mono); }
+
+    /* Install banner */
+    .install-banner {
+      display: none; width: 100%; max-width: 720px;
+      margin-bottom: 12px; padding: 12px 16px;
+      background: var(--surface); border: 1px solid var(--green-border);
+      border-radius: 12px; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .install-banner.show { display: flex; }
+    .install-banner p { font-size: 13px; color: var(--text-muted); font-family: var(--mono); }
+    .install-banner p span { color: var(--green); }
+    .install-btn {
+      background: var(--green); color: #0d0f14; border: none;
+      border-radius: 8px; padding: 7px 14px; font-size: 13px;
+      font-weight: 600; cursor: pointer; white-space: nowrap;
+      font-family: var(--sans);
+    }
+
+    @media (max-width: 420px) {
+      .grid { grid-template-columns: 1fr; }
+      .card-full { grid-column: 1; }
+      .card-value { font-size: 32px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════
+       PASTE YOUR FIREBASE CONFIG HERE
+       ═══════════════════════════════════════════════════ -->
+  <script type="module">
+    import { initializeApp }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, onValue, set }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey:            "YOUR_API_KEY",
+      authDomain:        "YOUR_PROJECT.firebaseapp.com",
+      databaseURL:       "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+      projectId:         "YOUR_PROJECT_ID",
+      storageBucket:     "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId:             "YOUR_APP_ID"
+    };
+
+    const THRESHOLD_A = 20;
+    const app = initializeApp(firebaseConfig);
+    const db  = getDatabase(app);
+
+    const currentRef = ref(db, 'sscb/current');
+    const faultRef   = ref(db, 'sscb/fault');
+    const relayRef   = ref(db, 'sscb/relay');
+    const connRef    = ref(db, '.info/connected');
+
+    const $currentVal   = document.getElementById('current-val');
+    const $currentBar   = document.getElementById('current-bar');
+    const $statusIcon   = document.getElementById('status-icon');
+    const $statusText   = document.getElementById('status-text');
+    const $statusSub    = document.getElementById('status-sub');
+    const $breakerState = document.getElementById('breaker-state');
+    const $breakerDesc  = document.getElementById('breaker-desc');
+    const $toggleBtn    = document.getElementById('toggle-btn');
+    const $faultStrip   = document.getElementById('fault-strip');
+    const $livePill     = document.getElementById('live-pill');
+    const $logList      = document.getElementById('log-list');
+
+    document.getElementById('threshold-label').textContent = 'Threshold: ' + THRESHOLD_A + ' A';
+
+    let isFault = false, isOn = false, eventLog = [];
+
+    function ts() { return new Date().toLocaleTimeString('en-GB', { hour12: false }); }
+
+    function addLog(msg, type) {
+      eventLog.unshift({ msg, type, ts: ts() });
+      if (eventLog.length > 10) eventLog.pop();
+      renderLog();
+    }
+
+    function renderLog() {
+      if (!eventLog.length) { $logList.innerHTML = '<p class="empty-log">No events yet.</p>'; return; }
+      $logList.innerHTML = eventLog.map(e =>
+        `<div class="log-row">
+          <div class="log-left"><div class="log-dot ${e.type}"></div><span class="log-msg">${e.msg}</span></div>
+          <span class="log-time">${e.ts}</span>
+        </div>`
+      ).join('');
+    }
+
+    onValue(connRef, snap => {
+      if (snap.val() === true) {
+        if (!isFault) $livePill.className = 'live-pill';
+        addLog('Connected to Firebase', 'ok');
+      } else {
+        $livePill.className = 'live-pill disconnected';
+        addLog('Disconnected — retrying...', 'warn');
+      }
+    });
+
+    onValue(currentRef, snap => {
+      const val = snap.val();
+      if (val === null) return;
+      const amps = parseFloat(val);
+      $currentVal.textContent = amps.toFixed(1);
+      const pct = Math.min((amps / THRESHOLD_A) * 100, 100);
+      $currentBar.style.width = pct + '%';
+      $currentBar.classList.remove('warn', 'danger');
+      if      (pct > 85) $currentBar.classList.add('danger');
+      else if (pct > 65) $currentBar.classList.add('warn');
+    });
+
+    onValue(faultRef, snap => {
+      const fault = snap.val();
+      if (fault === true && !isFault) {
+        isFault = true;
+        $statusIcon.textContent = '⚠'; $statusIcon.className = 'status-icon fault';
+        $statusText.textContent = 'Fault'; $statusText.className = 'status-text fault';
+        $statusSub.textContent  = 'Overcurrent detected — breaker tripped';
+        $faultStrip.classList.add('show');
+        $toggleBtn.classList.add('disabled');
+        $breakerState.textContent = 'TRIPPED'; $breakerState.className = 'breaker-state fault';
+        $breakerDesc.textContent  = 'Switch locked — clear fault to restore';
+        $livePill.className = 'live-pill fault';
+        addLog('FAULT: overcurrent — breaker tripped', 'fault');
+      } else if (fault === false && isFault) {
+        isFault = false;
+        $statusIcon.textContent = '✓'; $statusIcon.className = 'status-icon ok';
+        $statusText.textContent = 'Normal'; $statusText.className = 'status-text ok';
+        $statusSub.textContent  = 'No faults detected';
+        $faultStrip.classList.remove('show');
+        $toggleBtn.classList.remove('disabled');
+        $breakerState.textContent = isOn ? 'ON' : 'OFF';
+        $breakerState.className   = 'breaker-state ' + (isOn ? 'on' : 'off');
+        $breakerDesc.textContent  = isOn ? 'Circuit is active' : 'Circuit is off';
+        $livePill.className = 'live-pill';
+        addLog('Fault cleared — control restored', 'ok');
+      }
+    });
+
+    onValue(relayRef, snap => {
+      const val = snap.val();
+      if (val === null) return;
+      isOn = val === true;
+      $toggleBtn.classList.toggle('on', isOn);
+      if (!isFault) {
+        $breakerState.textContent = isOn ? 'ON' : 'OFF';
+        $breakerState.className   = 'breaker-state ' + (isOn ? 'on' : 'off');
+        $breakerDesc.textContent  = isOn ? 'Circuit is active' : 'Circuit is off';
+      }
+    });
+
+    $toggleBtn.addEventListener('click', () => {
+      if (isFault) return;
+      const next = !isOn;
+      set(relayRef, next)
+        .then(() => addLog('Command: relay ' + (next ? 'ON' : 'OFF'), 'ok'))
+        .catch(() => addLog('Write failed — check Firebase rules', 'fault'));
+    });
+
+    /* ── PWA install prompt ── */
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', e => {
+      e.preventDefault();
+      deferredPrompt = e;
+      document.getElementById('install-banner').classList.add('show');
+    });
+    document.getElementById('install-btn').addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        document.getElementById('install-banner').classList.remove('show');
+        addLog('App installed to home screen', 'ok');
+      }
+      deferredPrompt = null;
+    });
+
+    /* ── Register service worker ── */
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./service-worker.js')
+        .catch(err => console.warn('SW error:', err));
+    }
+
+    renderLog();
+  </script>
+
+  <!-- Install banner (shows automatically on Android Chrome) -->
+  <div class="install-banner" id="install-banner">
+    <p>⚡ Add <span>SSCB</span> to your home screen</p>
+    <button class="install-btn" id="install-btn">Install</button>
+  </div>
+
+  <header>
+    <div>
+      <p class="header-title">Solid State Circuit Breaker</p>
+      <p class="header-name">SSCB Monitor</p>
+    </div>
+    <div id="live-pill" class="live-pill disconnected">
+      <div class="live-dot"></div> LIVE
+    </div>
+  </header>
+
+  <div class="grid">
+    <div class="card">
+      <p class="card-label">Current</p>
+      <p class="card-value"><span id="current-val">--.-</span><span class="card-unit">A</span></p>
+      <div class="current-bar-wrap"><div class="current-bar-fill" id="current-bar"></div></div>
+      <p class="card-sub" id="threshold-label">Threshold: -- A</p>
+    </div>
+
+    <div class="card">
+      <p class="card-label">Status</p>
+      <div class="status-indicator">
+        <div class="status-icon ok" id="status-icon">✓</div>
+        <span class="status-text ok" id="status-text">Normal</span>
+      </div>
+      <p class="card-sub" id="status-sub">Waiting for ESP data...</p>
+    </div>
+
+    <div class="card card-full">
+      <p class="card-label">Breaker control</p>
+      <div class="breaker-row">
+        <div>
+          <p class="breaker-state off" id="breaker-state">OFF</p>
+          <p class="breaker-desc" id="breaker-desc">Waiting for data...</p>
+        </div>
+        <div class="toggle-btn disabled" id="toggle-btn" role="switch" aria-checked="false" tabindex="0">
+          <div class="toggle-knob"></div>
+        </div>
+      </div>
+      <div class="fault-strip" id="fault-strip">
+        ⚠ FAULT ACTIVE — switch locked. Clear the fault condition to restore control.
+      </div>
+    </div>
+
+    <div class="card card-full">
+      <p class="card-label">Event log</p>
+      <div class="log-list" id="log-list">
+        <p class="empty-log">Connecting to Firebase...</p>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
