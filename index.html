@@ -47,19 +47,15 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: env(safe-area-inset-top, 1.5rem) 1rem env(safe-area-inset-bottom, 2rem);
-      padding-top: max(env(safe-area-inset-top), 1.5rem);
+      padding: max(env(safe-area-inset-top), 1.5rem) 1rem env(safe-area-inset-bottom, 2rem);
     }
     header {
       width: 100%; max-width: 720px;
       display: flex; align-items: flex-start; justify-content: space-between;
       margin-bottom: 1.5rem;
     }
-    .header-title {
-      font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
-      color: var(--text-muted); font-family: var(--mono); margin-bottom: 4px;
-    }
-    .header-name { font-size: 22px; font-weight: 600; color: var(--text); letter-spacing: -0.3px; }
+    .header-title { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); font-family: var(--mono); margin-bottom: 4px; }
+    .header-name  { font-size: 22px; font-weight: 600; color: var(--text); letter-spacing: -0.3px; }
     .live-pill {
       display: flex; align-items: center; gap: 6px;
       font-size: 11px; font-family: var(--mono); letter-spacing: 0.1em;
@@ -67,10 +63,7 @@
       border: 1px solid var(--green-border);
       border-radius: 99px; padding: 5px 12px; margin-top: 4px; transition: all 0.3s;
     }
-    .live-dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--green); animation: blink 2s ease-in-out infinite;
-    }
+    .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: blink 2s ease-in-out infinite; }
     .live-pill.disconnected { color: var(--text-muted); background: transparent; border-color: var(--border); }
     .live-pill.disconnected .live-dot { background: var(--text-muted); animation: none; }
     .live-pill.fault { color: var(--red); background: var(--red-bg); border-color: var(--red-border); }
@@ -78,14 +71,8 @@
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
 
     .grid { width: 100%; max-width: 720px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 16px; padding: 1.25rem 1.25rem;
-    }
-    .card-label {
-      font-size: 11px; font-family: var(--mono); letter-spacing: 0.14em;
-      text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px;
-    }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.25rem; }
+    .card-label { font-size: 11px; font-family: var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
     .card-value { font-family: var(--mono); font-size: 38px; color: var(--text); line-height: 1; letter-spacing: -1px; }
     .card-unit  { font-size: 16px; color: var(--text-muted); margin-left: 4px; }
     .card-sub   { font-size: 12px; color: var(--text-dim); margin-top: 8px; font-family: var(--mono); }
@@ -95,15 +82,20 @@
     .current-bar-fill.warn   { background: var(--amber); }
     .current-bar-fill.danger { background: var(--red); }
 
-    .status-indicator { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    /* Status card */
+    .status-indicator { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
     .status-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: all 0.3s; }
     .status-icon.ok    { background: var(--green-bg); }
     .status-icon.fault { background: var(--red-bg); }
     .status-text { font-size: 16px; font-weight: 600; transition: color 0.3s; }
     .status-text.ok    { color: var(--green); }
     .status-text.fault { color: var(--red); }
+    .fault-reason { font-size: 12px; font-family: var(--mono); margin-top: 4px; color: var(--text-muted); }
+    .fault-reason.active { color: var(--red); }
 
     .card-full { grid-column: 1 / -1; }
+
+    /* Breaker card */
     .breaker-row { display: flex; align-items: center; justify-content: space-between; }
     .breaker-state { font-size: 28px; font-weight: 600; font-family: var(--mono); letter-spacing: -0.5px; transition: color 0.3s; }
     .breaker-state.on    { color: var(--green); }
@@ -134,12 +126,9 @@
     }
     .fault-strip.show { display: block; }
 
+    /* Log */
     .log-list { display: flex; flex-direction: column; }
-    .log-row {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 9px 0; border-bottom: 1px solid var(--border);
-      font-size: 13px; font-family: var(--mono);
-    }
+    .log-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13px; font-family: var(--mono); }
     .log-row:last-child { border-bottom: none; }
     .log-left { display: flex; align-items: center; gap: 10px; }
     .log-dot  { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
@@ -151,21 +140,11 @@
     .empty-log { font-size: 12px; color: var(--text-dim); font-family: var(--mono); }
 
     /* Install banner */
-    .install-banner {
-      display: none; width: 100%; max-width: 720px;
-      margin-bottom: 12px; padding: 12px 16px;
-      background: var(--surface); border: 1px solid var(--green-border);
-      border-radius: 12px; align-items: center; justify-content: space-between; gap: 12px;
-    }
+    .install-banner { display: none; width: 100%; max-width: 720px; margin-bottom: 12px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--green-border); border-radius: 12px; align-items: center; justify-content: space-between; gap: 12px; }
     .install-banner.show { display: flex; }
     .install-banner p { font-size: 13px; color: var(--text-muted); font-family: var(--mono); }
     .install-banner p span { color: var(--green); }
-    .install-btn {
-      background: var(--green); color: #0d0f14; border: none;
-      border-radius: 8px; padding: 7px 14px; font-size: 13px;
-      font-weight: 600; cursor: pointer; white-space: nowrap;
-      font-family: var(--sans);
-    }
+    .install-btn { background: var(--green); color: #0d0f14; border: none; border-radius: 8px; padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; font-family: var(--sans); }
 
     @media (max-width: 420px) {
       .grid { grid-template-columns: 1fr; }
@@ -176,49 +155,53 @@
 </head>
 <body>
 
-  <!-- ═══════════════════════════════════════════════════
-       PASTE YOUR FIREBASE CONFIG HERE
-       ═══════════════════════════════════════════════════ -->
   <script type="module">
-    import { initializeApp }
-      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, onValue, set }
-      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-analytics.js";
+    /* ═══════════════════════════════════════════
+       PASTE YOUR FIREBASE CONFIG HERE
+       ═══════════════════════════════════════════ */
     const firebaseConfig = {
-      apiKey:            "YOUR_API_KEY",
-      authDomain:        "YOUR_PROJECT.firebaseapp.com",
-      databaseURL:       "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
-      projectId:         "YOUR_PROJECT_ID",
-      storageBucket:     "YOUR_PROJECT.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId:             "YOUR_APP_ID"
-    };
+        apiKey: "AIzaSyDwmOMzeaA5I8PqAKX-MAtJOvaXcJP1c5E",
+        authDomain: "sscb-423ed.firebaseapp.com",
+        databaseURL: "https://sscb-423ed-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "sscb-423ed",
+        storageBucket: "sscb-423ed.firebasestorage.app",
+        messagingSenderId: "447199592315",
+        appId: "1:447199592315:web:2e6a3adb36aa82b2eb47de",
+        measurementId: "G-30YQ6M7DJ4"
+     };
 
-    const THRESHOLD_A = 20;
+    const THRESHOLD_A = 20; // change to your SSCB current rating
+
     const app = initializeApp(firebaseConfig);
     const db  = getDatabase(app);
 
-    const currentRef = ref(db, 'sscb/current');
-    const faultRef   = ref(db, 'sscb/fault');
-    const relayRef   = ref(db, 'sscb/relay');
-    const connRef    = ref(db, '.info/connected');
+    /* ── Firebase refs (root level paths) ── */
+    const currentRef     = ref(db, 'current');      // ESP writes
+    const faultRef       = ref(db, 'fault');         // ESP writes
+    const faultReasonRef = ref(db, 'faultReason');   // ESP writes
+    const switchRef      = ref(db, 'switch');         // Website writes, ESP reads
 
-    const $currentVal   = document.getElementById('current-val');
-    const $currentBar   = document.getElementById('current-bar');
-    const $statusIcon   = document.getElementById('status-icon');
-    const $statusText   = document.getElementById('status-text');
-    const $statusSub    = document.getElementById('status-sub');
-    const $breakerState = document.getElementById('breaker-state');
-    const $breakerDesc  = document.getElementById('breaker-desc');
-    const $toggleBtn    = document.getElementById('toggle-btn');
-    const $faultStrip   = document.getElementById('fault-strip');
-    const $livePill     = document.getElementById('live-pill');
-    const $logList      = document.getElementById('log-list');
+    /* ── DOM ── */
+    const $currentVal    = document.getElementById('current-val');
+    const $currentBar    = document.getElementById('current-bar');
+    const $statusIcon    = document.getElementById('status-icon');
+    const $statusText    = document.getElementById('status-text');
+    const $faultReason   = document.getElementById('fault-reason');
+    const $breakerState  = document.getElementById('breaker-state');
+    const $breakerDesc   = document.getElementById('breaker-desc');
+    const $toggleBtn     = document.getElementById('toggle-btn');
+    const $faultStrip    = document.getElementById('fault-strip');
+    const $faultStripMsg = document.getElementById('fault-strip-msg');
+    const $livePill      = document.getElementById('live-pill');
+    const $logList       = document.getElementById('log-list');
 
     document.getElementById('threshold-label').textContent = 'Threshold: ' + THRESHOLD_A + ' A';
 
-    let isFault = false, isOn = false, eventLog = [];
+    let isFault = false;
+    let isOn    = false;
+    let eventLog = [];
 
     function ts() { return new Date().toLocaleTimeString('en-GB', { hour12: false }); }
 
@@ -238,6 +221,8 @@
       ).join('');
     }
 
+    /* ── Connection ── */
+    const connRef = ref(db, '.info/connected');
     onValue(connRef, snap => {
       if (snap.val() === true) {
         if (!isFault) $livePill.className = 'live-pill';
@@ -248,6 +233,7 @@
       }
     });
 
+    /* ── current (ESP → Firebase → Website) ── */
     onValue(currentRef, snap => {
       const val = snap.val();
       if (val === null) return;
@@ -260,24 +246,30 @@
       else if (pct > 65) $currentBar.classList.add('warn');
     });
 
+    /* ── fault (ESP → Firebase → Website) ── */
     onValue(faultRef, snap => {
       const fault = snap.val();
       if (fault === true && !isFault) {
         isFault = true;
-        $statusIcon.textContent = '⚠'; $statusIcon.className = 'status-icon fault';
-        $statusText.textContent = 'Fault'; $statusText.className = 'status-text fault';
-        $statusSub.textContent  = 'Overcurrent detected — breaker tripped';
+        $statusIcon.textContent = '⚠';
+        $statusIcon.className   = 'status-icon fault';
+        $statusText.textContent = 'Fault';
+        $statusText.className   = 'status-text fault';
         $faultStrip.classList.add('show');
         $toggleBtn.classList.add('disabled');
-        $breakerState.textContent = 'TRIPPED'; $breakerState.className = 'breaker-state fault';
+        $breakerState.textContent = 'TRIPPED';
+        $breakerState.className   = 'breaker-state fault';
         $breakerDesc.textContent  = 'Switch locked — clear fault to restore';
         $livePill.className = 'live-pill fault';
-        addLog('FAULT: overcurrent — breaker tripped', 'fault');
+        addLog('FAULT detected — breaker tripped', 'fault');
       } else if (fault === false && isFault) {
         isFault = false;
-        $statusIcon.textContent = '✓'; $statusIcon.className = 'status-icon ok';
-        $statusText.textContent = 'Normal'; $statusText.className = 'status-text ok';
-        $statusSub.textContent  = 'No faults detected';
+        $statusIcon.textContent = '✓';
+        $statusIcon.className   = 'status-icon ok';
+        $statusText.textContent = 'Normal';
+        $statusText.className   = 'status-text ok';
+        $faultReason.textContent = 'Reason: None';
+        $faultReason.className   = 'fault-reason';
         $faultStrip.classList.remove('show');
         $toggleBtn.classList.remove('disabled');
         $breakerState.textContent = isOn ? 'ON' : 'OFF';
@@ -288,11 +280,28 @@
       }
     });
 
-    onValue(relayRef, snap => {
+    /* ── faultReason (ESP → Firebase → Website) ── */
+    onValue(faultReasonRef, snap => {
+      const reason = snap.val();
+      if (!reason || reason === 'None') {
+        $faultReason.textContent = 'Reason: None';
+        $faultReason.className   = 'fault-reason';
+        $faultStripMsg.textContent = '⚠ FAULT ACTIVE — switch locked. Clear the fault to restore control.';
+      } else {
+        $faultReason.textContent = 'Reason: ' + reason;
+        $faultReason.className   = 'fault-reason active';
+        $faultStripMsg.textContent = '⚠ ' + reason + ' detected — switch locked. Clear the fault to restore control.';
+        addLog('Fault reason: ' + reason, 'fault');
+      }
+    });
+
+    /* ── switch (Firebase → Website, mirrors what ESP confirmed) ── */
+    onValue(switchRef, snap => {
       const val = snap.val();
       if (val === null) return;
       isOn = val === true;
       $toggleBtn.classList.toggle('on', isOn);
+      $toggleBtn.setAttribute('aria-checked', isOn ? 'true' : 'false');
       if (!isFault) {
         $breakerState.textContent = isOn ? 'ON' : 'OFF';
         $breakerState.className   = 'breaker-state ' + (isOn ? 'on' : 'off');
@@ -300,12 +309,17 @@
       }
     });
 
+    /* ── Toggle click (Website → Firebase → ESP reads it) ── */
     $toggleBtn.addEventListener('click', () => {
       if (isFault) return;
       const next = !isOn;
-      set(relayRef, next)
-        .then(() => addLog('Command: relay ' + (next ? 'ON' : 'OFF'), 'ok'))
+      set(switchRef, next)
+        .then(() => addLog('Switch command: ' + (next ? 'ON' : 'OFF'), 'ok'))
         .catch(() => addLog('Write failed — check Firebase rules', 'fault'));
+    });
+
+    $toggleBtn.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') $toggleBtn.click();
     });
 
     /* ── PWA install prompt ── */
@@ -326,16 +340,14 @@
       deferredPrompt = null;
     });
 
-    /* ── Register service worker ── */
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./service-worker.js')
-        .catch(err => console.warn('SW error:', err));
+        .catch(err => console.warn('SW:', err));
     }
 
     renderLog();
   </script>
 
-  <!-- Install banner (shows automatically on Android Chrome) -->
   <div class="install-banner" id="install-banner">
     <p>⚡ Add <span>SSCB</span> to your home screen</p>
     <button class="install-btn" id="install-btn">Install</button>
@@ -352,6 +364,8 @@
   </header>
 
   <div class="grid">
+
+    <!-- Current -->
     <div class="card">
       <p class="card-label">Current</p>
       <p class="card-value"><span id="current-val">--.-</span><span class="card-unit">A</span></p>
@@ -359,15 +373,17 @@
       <p class="card-sub" id="threshold-label">Threshold: -- A</p>
     </div>
 
+    <!-- Status -->
     <div class="card">
       <p class="card-label">Status</p>
       <div class="status-indicator">
         <div class="status-icon ok" id="status-icon">✓</div>
         <span class="status-text ok" id="status-text">Normal</span>
       </div>
-      <p class="card-sub" id="status-sub">Waiting for ESP data...</p>
+      <p class="fault-reason" id="fault-reason">Reason: None</p>
     </div>
 
+    <!-- Breaker control -->
     <div class="card card-full">
       <p class="card-label">Breaker control</p>
       <div class="breaker-row">
@@ -380,17 +396,18 @@
         </div>
       </div>
       <div class="fault-strip" id="fault-strip">
-        ⚠ FAULT ACTIVE — switch locked. Clear the fault condition to restore control.
+        <span id="fault-strip-msg">⚠ FAULT ACTIVE — switch locked. Clear the fault condition to restore control.</span>
       </div>
     </div>
 
+    <!-- Event log -->
     <div class="card card-full">
       <p class="card-label">Event log</p>
       <div class="log-list" id="log-list">
         <p class="empty-log">Connecting to Firebase...</p>
       </div>
     </div>
-  </div>
 
+  </div>
 </body>
 </html>
