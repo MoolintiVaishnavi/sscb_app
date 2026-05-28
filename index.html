@@ -296,13 +296,13 @@
     const connRef = ref(db, '.info/connected');
     onValue(connRef, snap => {
       if (snap.val() === true) {
-        if (!isFault) $livePill.className = 'live-pill';
-        addLog('Connected to Firebase', 'ok');
-      } else {
-        $livePill.className = 'live-pill disconnected';
-        addLog('Disconnected — retrying...', 'warn');
-      }
-    });
+          if (!isFault) $livePill.className = 'live-pill';
+          addLog('Connected to Firebase', 'ok');
+        } else {
+          $livePill.className = 'live-pill disconnected';
+          addLog('Disconnected — retrying...', 'warn');
+        }
+     });
 
     /* ── current (ESP → Firebase → Website) ── */
     onValue(currentRef, snap => {
@@ -319,48 +319,81 @@
 
     /* ── fault (ESP → Firebase → Website) ── */
     onValue(faultRef, snap => {
-      const fault = snap.val();
-      const isFaultNow =
-      fault === true ||
-      fault === "true" ||
-      fault === 1;
-    
-      if (isFaultNow && !isFault) {
-        if (Notification.permission === "granted") {
+
+        const fault = snap.val();
+      
+        const isFaultNow =
+          fault === true ||
+          fault === "true" ||
+          fault === 1;
+      
+        if (isFaultNow && !isFault) {
+      
+          if (Notification.permission === "granted") {
+      
             new Notification("SSCB Fault Detected ⚠", {
-            body: "Breaker tripped due to fault condition",
-            icon: "./icon-192.png"
-          });
+              body: "Breaker tripped due to fault condition",
+              icon: "./icon-192.png"
+            });
+      
+          }
+      
+          isFault = true;
+      
+          $statusIcon.textContent = '⚠';
+          $statusIcon.className = 'status-icon fault';
+      
+          $statusText.textContent = 'Fault';
+          $statusText.className = 'status-text fault';
+      
+          $faultStrip.classList.add('show');
+      
+          $toggleBtn.classList.add('disabled');
+      
+          $breakerState.textContent = 'TRIPPED';
+          $breakerState.className = 'breaker-state fault';
+      
+          $breakerDesc.textContent =
+            'Switch locked — clear fault to restore';
+      
+          $livePill.className = 'live-pill fault';
+      
+          addLog('FAULT detected — breaker tripped', 'fault');
+      
         }
-        isFault = true;
-        $statusIcon.textContent = '⚠';
-        $statusIcon.className   = 'status-icon fault';
-        $statusText.textContent = 'Fault';
-        $statusText.className   = 'status-text fault';
-        $faultStrip.classList.add('show');
-        $toggleBtn.classList.add('disabled');
-        $breakerState.textContent = 'TRIPPED';
-        $breakerState.className   = 'breaker-state fault';
-        $breakerDesc.textContent  = 'Switch locked — clear fault to restore';
-        $livePill.className = 'live-pill fault';
-        addLog('FAULT detected — breaker tripped', 'fault');
-      } else if (fault === false && isFault) {
-        isFault = false;
-        $statusIcon.textContent = '✓';
-        $statusIcon.className   = 'status-icon ok';
-        $statusText.textContent = 'Normal';
-        $statusText.className   = 'status-text ok';
-        $faultReason.textContent = 'Reason: None';
-        $faultReason.className   = 'fault-reason';
-        $faultStrip.classList.remove('show');
-        $toggleBtn.classList.remove('disabled');
-        $breakerState.textContent = isOn ? 'ON' : 'OFF';
-        $breakerState.className   = 'breaker-state ' + (isOn ? 'on' : 'off');
-        $breakerDesc.textContent  = isOn ? 'Circuit is active' : 'Circuit is off';
-        $livePill.className = 'live-pill';
-        addLog('Fault cleared — control restored', 'ok');
-      }
-    });
+      
+        else if (!isFaultNow && isFault) {
+      
+          isFault = false;
+      
+          $statusIcon.textContent = '✓';
+          $statusIcon.className = 'status-icon ok';
+      
+          $statusText.textContent = 'Normal';
+          $statusText.className = 'status-text ok';
+      
+          $faultReason.textContent = 'Reason: None';
+          $faultReason.className = 'fault-reason';
+      
+          $faultStrip.classList.remove('show');
+      
+          $toggleBtn.classList.remove('disabled');
+      
+          $breakerState.textContent =
+            isOn ? 'ON' : 'OFF';
+      
+          $breakerState.className =
+            'breaker-state ' + (isOn ? 'on' : 'off');
+      
+          $breakerDesc.textContent =
+            isOn ? 'Circuit is active' : 'Circuit is off';
+      
+          $livePill.className = 'live-pill';
+      
+          addLog('Fault cleared — control restored', 'ok');
+        }
+      
+      });
 
     /* ── faultReason (ESP → Firebase → Website) ── */
     onValue(faultReasonRef, snap => {
