@@ -178,10 +178,14 @@
     const db  = getDatabase(app);
 
     /* ── Firebase refs (root level paths) ── */
-    const currentRef     = ref(db, 'current');      // ESP writes
-    const faultRef       = ref(db, 'fault');         // ESP writes
-    const faultReasonRef = ref(db, 'faultReason');   // ESP writes
-    const switchRef      = ref(db, 'switch');         // Website writes, ESP reads
+    //const currentRef     = ref(db, 'current');      // ESP writes
+    //const faultRef       = ref(db, 'fault');         // ESP writes
+    //const faultReasonRef = ref(db, 'faultReason');   // ESP writes
+    //const switchRef      = ref(db, 'switch');         // Website writes, ESP reads
+    const currentRef = ref(db, 'sscb_data/current');
+    const faultRef = ref(db, 'sscb_data/fault');
+    const switchRef = ref(db, 'sscb/switch');
+    const faultReasonRef = ref(db, 'sscb_data/faultReason');
 
     /* ── DOM ── */
     const $currentVal    = document.getElementById('current-val');
