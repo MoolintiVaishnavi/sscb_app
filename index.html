@@ -320,7 +320,12 @@
     /* ── fault (ESP → Firebase → Website) ── */
     onValue(faultRef, snap => {
       const fault = snap.val();
-      if (fault === true && !isFault) {
+      const isFaultNow =
+      fault === true ||
+      fault === "true" ||
+      fault === 1;
+    
+      if (isFaultNow && !isFault) {
         if (Notification.permission === "granted") {
             new Notification("SSCB Fault Detected ⚠", {
             body: "Breaker tripped due to fault condition",
