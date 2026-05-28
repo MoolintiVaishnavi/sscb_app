@@ -155,6 +155,67 @@
 </head>
 <body>
 
+  <div class="install-banner" id="install-banner">
+    <p>⚡ Add <span>SSCB</span> to your home screen</p>
+    <button class="install-btn" id="install-btn">Install</button>
+  </div>
+
+  <header>
+    <div>
+      <p class="header-title">Solid State Circuit Breaker</p>
+      <p class="header-name">SSCB Monitor</p>
+    </div>
+    <div id="live-pill" class="live-pill disconnected">
+      <div class="live-dot"></div> LIVE
+    </div>
+  </header>
+
+  <div class="grid">
+
+    <!-- Current -->
+    <div class="card">
+      <p class="card-label">Current</p>
+      <p class="card-value"><span id="current-val">--.-</span><span class="card-unit">A</span></p>
+      <div class="current-bar-wrap"><div class="current-bar-fill" id="current-bar"></div></div>
+      <p class="card-sub" id="threshold-label">Threshold: -- A</p>
+    </div>
+
+    <!-- Status -->
+    <div class="card">
+      <p class="card-label">Status</p>
+      <div class="status-indicator">
+        <div class="status-icon ok" id="status-icon">✓</div>
+        <span class="status-text ok" id="status-text">Normal</span>
+      </div>
+      <p class="fault-reason" id="fault-reason">Reason: None</p>
+    </div>
+
+    <!-- Breaker control -->
+    <div class="card card-full">
+      <p class="card-label">Breaker control</p>
+      <div class="breaker-row">
+        <div>
+          <p class="breaker-state off" id="breaker-state">OFF</p>
+          <p class="breaker-desc" id="breaker-desc">Waiting for data...</p>
+        </div>
+        <div class="toggle-btn disabled" id="toggle-btn" role="switch" aria-checked="false" tabindex="0">
+          <div class="toggle-knob"></div>
+        </div>
+      </div>
+      <div class="fault-strip" id="fault-strip">
+        <span id="fault-strip-msg">⚠ FAULT ACTIVE — switch locked. Clear the fault condition to restore control.</span>
+      </div>
+    </div>
+
+    <!-- Event log -->
+    <div class="card card-full">
+      <p class="card-label">Event log</p>
+      <div class="log-list" id="log-list">
+        <p class="empty-log">Connecting to Firebase...</p>
+      </div>
+    </div>
+
+  </div>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
     import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
@@ -351,67 +412,5 @@
 
     renderLog();
   </script>
-
-  <div class="install-banner" id="install-banner">
-    <p>⚡ Add <span>SSCB</span> to your home screen</p>
-    <button class="install-btn" id="install-btn">Install</button>
-  </div>
-
-  <header>
-    <div>
-      <p class="header-title">Solid State Circuit Breaker</p>
-      <p class="header-name">SSCB Monitor</p>
-    </div>
-    <div id="live-pill" class="live-pill disconnected">
-      <div class="live-dot"></div> LIVE
-    </div>
-  </header>
-
-  <div class="grid">
-
-    <!-- Current -->
-    <div class="card">
-      <p class="card-label">Current</p>
-      <p class="card-value"><span id="current-val">--.-</span><span class="card-unit">A</span></p>
-      <div class="current-bar-wrap"><div class="current-bar-fill" id="current-bar"></div></div>
-      <p class="card-sub" id="threshold-label">Threshold: -- A</p>
-    </div>
-
-    <!-- Status -->
-    <div class="card">
-      <p class="card-label">Status</p>
-      <div class="status-indicator">
-        <div class="status-icon ok" id="status-icon">✓</div>
-        <span class="status-text ok" id="status-text">Normal</span>
-      </div>
-      <p class="fault-reason" id="fault-reason">Reason: None</p>
-    </div>
-
-    <!-- Breaker control -->
-    <div class="card card-full">
-      <p class="card-label">Breaker control</p>
-      <div class="breaker-row">
-        <div>
-          <p class="breaker-state off" id="breaker-state">OFF</p>
-          <p class="breaker-desc" id="breaker-desc">Waiting for data...</p>
-        </div>
-        <div class="toggle-btn disabled" id="toggle-btn" role="switch" aria-checked="false" tabindex="0">
-          <div class="toggle-knob"></div>
-        </div>
-      </div>
-      <div class="fault-strip" id="fault-strip">
-        <span id="fault-strip-msg">⚠ FAULT ACTIVE — switch locked. Clear the fault condition to restore control.</span>
-      </div>
-    </div>
-
-    <!-- Event log -->
-    <div class="card card-full">
-      <p class="card-label">Event log</p>
-      <div class="log-list" id="log-list">
-        <p class="empty-log">Connecting to Firebase...</p>
-      </div>
-    </div>
-
-  </div>
 </body>
 </html>
