@@ -24,8 +24,13 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  if (e.request.url.includes('firebaseio') || e.request.url.includes('googleapis')) {
-    return;
+  if (
+    e.request.url.includes('firebaseio') ||
+    e.request.url.includes('googleapis') ||
+    e.request.url.includes('gstatic.com') ||  // ← add this
+    e.request.url.includes('firebasejs')       // ← and this
+  ) {
+    return; // let browser handle it directly
   }
 
   e.respondWith(
@@ -37,7 +42,7 @@ self.addEventListener('fetch', e => {
       })
       .catch(() =>
         caches.match(e.request).then(cached =>
-          cached || new Response('Not found', { status: 404 }) // ← never return undefined
+          cached || new Response('Not found', { status: 404 })
         )
       )
   );
