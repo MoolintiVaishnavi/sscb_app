@@ -2,7 +2,9 @@ const CACHE = 'sscb-v1';
 const ASSETS = [
   './',
   './index.html',
-  './manifest.json'
+  './manifest.json',
+  './icon-192.png',  // ← add this
+  './icon-512.png'   // ← and this if you have it
 ];
 
 self.addEventListener('install', e => {
@@ -22,11 +24,21 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // Always go network-first for Firebase calls
   if (e.request.url.includes('firebaseio') || e.request.url.includes('googleapis')) {
     return;
   }
+
   e.respondWith(
-    fetch(e.request).catch(() => caches.match(e.request))
+    fetch(e.request)
+      .then(response => {
+        const copy = response.clone();
+        caches.open(CACHE).then(c => c.put(e.request, copy));
+        return response;
+      })
+      .catch(() =>
+        caches.match(e.request).then(cached =>
+          cached || new Response('Not found', { status: 404 }) // ← never return undefined
+        )
+      )
   );
 });
