@@ -248,10 +248,10 @@
     }
 
     /* ── Firebase refs (root level paths) ── */
-    const currentRef = ref(db, 'sscb_data/current');
-    const faultRef = ref(db, 'sscb_data/fault');
+    const currentRef = ref(db, 'sscb/data/current');
+    const faultRef = ref(db, 'sscb/data/fault');
     const switchRef = ref(db, 'sscb/switch');
-    const faultReasonRef = ref(db, 'sscb_data/faultReason');
+    const faultReasonRef = ref(db, 'sscb/data/faultReason');
 
     /* ── DOM ── */
     const $currentVal    = document.getElementById('current-val');
